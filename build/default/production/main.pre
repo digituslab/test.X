@@ -6,7 +6,7 @@
 #pragma config FOSC = INTOSC
 #pragma config WDTE = OFF
 #pragma config PWRTE = ON
-#pragma config MCLRE = ON
+#pragma config MCLRE = OFF
 #pragma config CP = OFF
 #pragma config BOREN = OFF
 #pragma config CLKOUTEN = OFF
@@ -21,7 +21,7 @@
 #pragma config STVREN = ON
 #pragma config BORV = HI
 #pragma config LPBOR = OFF
-#pragma config LVP = OFF
+#pragma config LVP = ON
 
 # 26 "/Applications/microchip/xc8/v1.45/include/htc.h"
 extern const char __xc8_OPTIM_SPEED;
@@ -6472,7 +6472,7 @@ TRISAbits.TRISA5 = 0;
 INTPPS = 0b00000100;
 
 
-INTE = 1;
+INTCONbits.INTE = 1;
 }
 
 void interrupt isr_func(void){
@@ -6483,7 +6483,7 @@ INTCONbits.GIE = 0;
 
 if(TMR0IF){
 
-if(tm > 10){
+if(tm > 5){
 flip_led();
 tm = 0;
 } else {

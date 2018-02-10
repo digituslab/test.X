@@ -10,7 +10,6 @@ __CFG_PWRTE$ON 0 0 ABS 0
 _TMR0 15 0 ABS 0
 _TMR2 1A 0 ABS 0
 _WPUA 20C 0 ABS 0
-_INTE 5C 0 ABS 0
 _main 3A 0 CODE 0
 ___sp 0 0 STACK 2
 __size_of_isr_func 0 0 ABS 0
@@ -100,6 +99,7 @@ __end_of_main 8B 0 CODE 0
 _adconv 8B 0 CODE 0
 __Htext 0 0 ABS 0
 __Ltext 0 0 ABS 0
+__CFG_LVP$ON 0 0 ABS 0
 end_of_initialization 36 0 CODE 0
 __Hsfr10 0 0 ABS 0
 __Lsfr10 0 0 ABS 0
@@ -209,6 +209,7 @@ __Lspace_3 0 0 ABS 0
 __size_of_main 0 0 ABS 0
 ?_adconv 72 0 COMMON 1
 __end_of_flip_led E0 0 CODE 0
+__CFG_MCLRE$OFF 0 0 ABS 0
 __Hbank10 0 0 ABS 0
 __Lbank10 0 0 ABS 0
 adconv@temp 20 0 BANK0 1
@@ -287,14 +288,12 @@ __Lmaintext 0 0 ABS 0
 __CFG_IESO$OFF 0 0 ABS 0
 __pmaintext 3A 0 CODE 0
 __CFG_BORV$HI 0 0 ABS 0
-__CFG_MCLRE$ON 0 0 ABS 0
 __CFG_FOSC$INTOSC 0 0 ABS 0
 __initialization 34 0 CODE 0
 __size_of_setup_sci 0 0 ABS 0
 __size_of_setup_irq 0 0 ABS 0
 __size_of_setup_tmr 0 0 ABS 0
 __CFG_CP$OFF 0 0 ABS 0
-__CFG_LVP$OFF 0 0 ABS 0
 _BAUD1CONbits 19F 0 ABS 0
 %segments
 reset_vec 0 3 CODE 0 0
@@ -304,15 +303,15 @@ cstackCOMMON 70 7B COMMON 70 1
 cstackBANK0 20 29 BANK0 20 1
 %locals
 dist/default/production/test.X.production.obj
-/tmp/xctQ9fYVL
-630 34 0 CODE 0
-633 34 0 CODE 0
-645 34 0 CODE 0
-646 35 0 CODE 0
+/tmp/xcBevCaqz
+628 34 0 CODE 0
+631 34 0 CODE 0
+643 34 0 CODE 0
+644 35 0 CODE 0
+650 36 0 CODE 0
 652 36 0 CODE 0
-654 36 0 CODE 0
-655 37 0 CODE 0
-656 38 0 CODE 0
+653 37 0 CODE 0
+654 38 0 CODE 0
 main.c
 61 3A 0 CODE 0
 65 3A 0 CODE 0

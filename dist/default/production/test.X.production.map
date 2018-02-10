@@ -5,7 +5,7 @@ Linker command line:
 -W-3 --edf=/Applications/microchip/xc8/v1.45/dat/en_msgs.txt -cs \
   -h+dist/default/production/test.X.production.sym \
   --cmf=dist/default/production/test.X.production.cmf -z -Q16F1705 \
-  -o/tmp/xcR9dHVL1 -Mdist/default/production/test.X.production.map -E1 \
+  -o/tmp/xc9mTCxCa -Mdist/default/production/test.X.production.map -E1 \
   -ver=XC8 -ASTACK=0200Ah-023efh -pstack=STACK -ACODE=00h-07FFhx4 \
   -ASTRCODE=00h-01FFFh -ASTRING=00h-0FFhx32 -ACONST=00h-0FFhx32 \
   -AENTRY=00h-0FFhx32 -ACOMMON=070h-07Fh -ABANK0=020h-06Fh \
@@ -29,7 +29,7 @@ Linker command line:
   -ASFR31=0F80h-0FEFh -preset_vec=00h,intentry=04h,init,end_init \
   -ppowerup=CODE -pcinit=CODE -pfunctab=ENTRY -ACONFIG=08007h-08008h \
   -pconfig=CONFIG -DCONFIG=2 -AIDLOC=08000h-08003h -pidloc=IDLOC -DIDLOC=2 \
-  -DCODE=2 -DSTRCODE=2 -DSTRING=2 -DCONST=2 -DENTRY=2 -k /tmp/xcEkpY8Rk.obj \
+  -DCODE=2 -DSTRCODE=2 -DSTRING=2 -DCONST=2 -DENTRY=2 -k /tmp/xcLAnm4fz.obj \
   dist/default/production/test.X.production.obj 
 
 Object code version is 3.11
@@ -39,7 +39,7 @@ Machine type is 16F1705
 
 
                 Name                               Link     Load   Length Selector   Space Scale
-/tmp/xcEkpY8Rk.obj
+/tmp/xcLAnm4fz.obj
                 end_init                             32       32        2        8       0
                 reset_vec                             0        0        2        0       0
                 config                             8007     8007        2    1000E       0
@@ -329,7 +329,6 @@ _CCPR1L                  (abs)        00291
 _GO_nDONE                (abs)        004E9
 _INTCON                  (abs)        0000B
 _INTCONbits              (abs)        0000B
-_INTE                    (abs)        0005C
 _INTPPS                  (abs)        00E10
 _OPTION_REG              (abs)        00095
 _OSCCON                  (abs)        00099
@@ -365,8 +364,8 @@ __CFG_FCMEN$OFF          (abs)        00000
 __CFG_FOSC$INTOSC        (abs)        00000
 __CFG_IESO$OFF           (abs)        00000
 __CFG_LPBOR$OFF          (abs)        00000
-__CFG_LVP$OFF            (abs)        00000
-__CFG_MCLRE$ON           (abs)        00000
+__CFG_LVP$ON             (abs)        00000
+__CFG_MCLRE$OFF          (abs)        00000
 __CFG_PLLEN$OFF          (abs)        00000
 __CFG_PPS1WAY$OFF        (abs)        00000
 __CFG_PWRTE$ON           (abs)        00000

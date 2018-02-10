@@ -118,8 +118,6 @@ Version 3.2 HI-TECH Software Intermediate Code
 [n S58 . . ]
 "1035
 [v _TRISAbits `VS58 ~T0 @X0 0 e@140 ]
-"12441
-[v _INTE `Vb ~T0 @X0 0 e@92 ]
 "355
 [s S26 :1 `uc 1 :1 `uc 1 :1 `uc 1 :1 `uc 1 :1 `uc 1 :1 `uc 1 :1 `uc 1 :1 `uc 1 ]
 [n S26 . IOCIF INTF TMR0IF IOCIE INTE TMR0IE PEIE GIE ]
@@ -140,7 +138,7 @@ Version 3.2 HI-TECH Software Intermediate Code
 "15
 [p x PWRTE=ON ]
 "16
-[p x MCLRE=ON ]
+[p x MCLRE=OFF ]
 "17
 [p x CP=OFF ]
 "18
@@ -166,7 +164,7 @@ Version 3.2 HI-TECH Software Intermediate Code
 "30
 [p x LPBOR=OFF ]
 "31
-[p x LVP=OFF ]
+[p x LVP=ON ]
 [; ;htc.h: 26: extern const char __xc8_OPTIM_SPEED;
 [; ;htc.h: 28: extern double __fpnormalize(double);
 [; ;xc8debug.h: 14: extern void __builtin_software_breakpoint(void);
@@ -5163,9 +5161,9 @@ Version 3.2 HI-TECH Software Intermediate Code
 [; ;main.c: 186: INTPPS = 0b00000100;
 "186
 [e = _INTPPS -> -> 4 `i `uc ]
-[; ;main.c: 189: INTE = 1;
+[; ;main.c: 189: INTCONbits.INTE = 1;
 "189
-[e = _INTE -> -> 1 `i `b ]
+[e = . . _INTCONbits 0 4 -> -> 1 `i `uc ]
 [; ;main.c: 190: }
 "190
 [e :UE 605 ]
@@ -5191,9 +5189,9 @@ Version 3.2 HI-TECH Software Intermediate Code
 "198
 [e $ ! _TMR0IF 607  ]
 {
-[; ;main.c: 200: if(tm > 10){
+[; ;main.c: 200: if(tm > 5){
 "200
-[e $ ! > F4990 -> 10 `i 608  ]
+[e $ ! > F4990 -> 5 `i 608  ]
 {
 [; ;main.c: 201: flip_led();
 "201
