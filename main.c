@@ -121,7 +121,7 @@ int main(int argc, char** argv) {
           PORTC=0x00;
           PORTC=0xff;
           */
-        TX1REG = 'A';
+        TX1REG = 0x55;
         while(TX1STAbits.TRMT != 1);
 
      }    
@@ -149,9 +149,9 @@ void setup_sci(void){
     TX1STA = 0x00;          // Once clears the register to zero
     TX1STAbits.TXEN = 1;    // Transmission is enabled
     TX1STAbits.SYNC = 0;    // Asynchronous mode
-    TX1STAbits.BRGH = 1;    // Low speed baud rate mode
+    TX1STAbits.BRGH = 1;    // High speed baud rate mode
     TX1STAbits.CSRC = 1;
-    SP1BRGL = 12;
+    SP1BRGL = 207;           // BRG value for 9,600 bps
     SP1BRGH = 0;
     BAUD1CON = 0x00;        // Once clears the reigister to zero
     BAUD1CONbits.SCKP = 0;  // Transmit data polarity, 0 = Non inverted
@@ -191,10 +191,18 @@ void setup_irq(void){
 
 void interrupt isr_func(void){
    
+    static int tm = 0;
+
     INTCONbits.GIE = 0;
     
     if(TMR0IF){
-        flip_led();
+        // Waits 10 times for to blink the LED much slower.
+        if(tm > 10){
+            flip_led();
+            tm = 0;
+        } else {
+            tm++;
+        }
         TMR0IF &= 0;
     }
     

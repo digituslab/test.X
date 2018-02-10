@@ -6414,7 +6414,7 @@ num = adconv() ;
 CCPR1L = num/4 ;
 
 # 124
-TX1REG = 'A';
+TX1REG = 0x55;
 while(TX1STAbits.TRMT != 1);
 
 }
@@ -6437,7 +6437,7 @@ TX1STAbits.TXEN = 1;
 TX1STAbits.SYNC = 0;
 TX1STAbits.BRGH = 1;
 TX1STAbits.CSRC = 1;
-SP1BRGL = 12;
+SP1BRGL = 207;
 SP1BRGH = 0;
 BAUD1CON = 0x00;
 BAUD1CONbits.SCKP = 0;
@@ -6477,10 +6477,18 @@ INTE = 1;
 
 void interrupt isr_func(void){
 
+static int tm = 0;
+
 INTCONbits.GIE = 0;
 
 if(TMR0IF){
+
+if(tm > 10){
 flip_led();
+tm = 0;
+} else {
+tm++;
+}
 TMR0IF &= 0;
 }
 

@@ -6414,6 +6414,9 @@ num = adconv() ;
 CCPR1L = num/4 ;
 
 # 124
+TX1REG = 0x55;
+while(TX1STAbits.TRMT != 1);
+
 }
 return (0);
 }
@@ -6421,22 +6424,24 @@ return (0);
 void flip_led(void){
 PORTAbits.RA5 = !PORTAbits.RA5;
 
-# 139
+# 142
 }
 
 void setup_sci(void){
 TRISCbits.TRISC4 = 0;
-RC4PPS = 00010100;
+
+RC1STAbits.SPEN = 1;
+RC4PPS = 0b00010100;
 TX1STA = 0x00;
 TX1STAbits.TXEN = 1;
 TX1STAbits.SYNC = 0;
 TX1STAbits.BRGH = 1;
-SP1BRGL = 25;
+TX1STAbits.CSRC = 1;
+SP1BRGL = 207;
 SP1BRGH = 0;
 BAUD1CON = 0x00;
 BAUD1CONbits.SCKP = 0;
 BAUD1CONbits.BRG16= 1;
-RC1STAbits.SPEN = 1;
 
 }
 
@@ -6472,10 +6477,18 @@ INTE = 1;
 
 void interrupt isr_func(void){
 
+static int tm = 0;
+
 INTCONbits.GIE = 0;
 
 if(TMR0IF){
+
+if(tm > 10){
 flip_led();
+tm = 0;
+} else {
+tm++;
+}
 TMR0IF &= 0;
 }
 
