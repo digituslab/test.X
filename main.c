@@ -36,6 +36,9 @@
 #include <xc.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
+
+#define DEG2RAD (3.141592/180.0)
 
 unsigned int adconv()
 {
@@ -54,12 +57,15 @@ void setup_tmr(void);
 void flip_led(void);
 void setup_irq(void);
 void setup_sci(void);
+void setup_dac(void);
 
 /*
  * 
  */
 int main(int argc, char** argv) {
     unsigned int num;
+    static float yd = 0;
+    static float xd = 0;
     
     // Basic configurations for PIC16F1705
      OSCCON     = 0b01110010 ;  // 内部クロックは8ＭＨｚとする
@@ -112,10 +118,16 @@ int main(int argc, char** argv) {
      setup_tmr();
      setup_irq();
      setup_sci();
+     setup_dac();
      
      while(1) {
           num = adconv() ;  // 7番ピン(AN7)から半固定抵抗の値を読み込む
-          CCPR1L = num/4 ;  // アナログ値からのデータでデューティ値を設定
+//          CCPR1L = num/4 ;  // アナログ値からのデータでデューティ値を設定
+          yd = sin(DEG2RAD*xd)*127.0 + 127.0;
+          xd+=(num/10);
+          if(xd >=360.0){xd = 0;}
+          CCPR1L = (unsigned char)(yd/2+5);
+          DAC1CON1 = (unsigned char)yd;
           //CCPR1L = 10;
           /*
           PORTC=0x00;
@@ -139,6 +151,17 @@ void flip_led(void){
     }
     PORTA = led;
     */
+}
+
+void setup_dac(void){
+    // Setup ANSEL bit for DAC output as RA2
+    ANSELAbits.ANSA2 = 1;   // RA2 is used for analog output.
+    
+    // Setup pin function
+    
+    // Configures DAC and enables it.
+    DAC1CON0 = 0b10010000;
+    DAC1CON1 = 0x00;
 }
 
 void setup_sci(void){

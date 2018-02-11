@@ -6351,7 +6351,35 @@ extern char * ultoa(char * buf, unsigned long val, int base);
 
 extern char * ftoa(float f, int * status);
 
-# 40 "main.c"
+# 30 "/Applications/microchip/xc8/v1.45/include/math.h"
+extern double fabs(double);
+extern double floor(double);
+extern double ceil(double);
+extern double modf(double, double *);
+extern double sqrt(double);
+extern double atof(const char *);
+extern double sin(double) ;
+extern double cos(double) ;
+extern double tan(double) ;
+extern double asin(double) ;
+extern double acos(double) ;
+extern double atan(double);
+extern double atan2(double, double) ;
+extern double log(double);
+extern double log10(double);
+extern double pow(double, double) ;
+extern double exp(double) ;
+extern double sinh(double) ;
+extern double cosh(double) ;
+extern double tanh(double);
+extern double eval_poly(double, const double *, int);
+extern double frexp(double, int *);
+extern double ldexp(double, int);
+extern double fmod(double, double);
+extern double trunc(double);
+extern double round(double);
+
+# 43 "main.c"
 unsigned int adconv()
 {
 unsigned int temp;
@@ -6369,10 +6397,13 @@ void setup_tmr(void);
 void flip_led(void);
 void setup_irq(void);
 void setup_sci(void);
+void setup_dac(void);
 
-# 61
+# 65
 int main(int argc, char** argv) {
 unsigned int num;
+static float yd = 0;
+static float xd = 0;
 
 
 OSCCON = 0b01110010 ;
@@ -6394,7 +6425,7 @@ RC2PPS = 0b00001100 ;
 CCP1CON = 0b00001100;
 CCPR1L = 10;
 
-# 102
+# 108
 PWM3DCH = 64 ;
 PWM3DCL = 0 ;
 
@@ -6408,12 +6439,18 @@ num = 255;
 setup_tmr();
 setup_irq();
 setup_sci();
+setup_dac();
 
 while(1) {
 num = adconv() ;
-CCPR1L = num/4 ;
 
-# 124
+yd = sin((3.141592/180.0)*xd)*127.0 + 127.0;
+xd+=(num/10);
+if(xd >=360.0){xd = 0;}
+CCPR1L = (unsigned char)(yd/2+5);
+DAC1CON1 = (unsigned char)yd;
+
+# 136
 TX1REG = 0x55;
 while(TX1STAbits.TRMT != 1);
 
@@ -6424,7 +6461,18 @@ return (0);
 void flip_led(void){
 PORTAbits.RA5 = !PORTAbits.RA5;
 
-# 142
+# 154
+}
+
+void setup_dac(void){
+
+ANSELAbits.ANSA2 = 1;
+
+
+
+
+DAC1CON0 = 0b10010000;
+DAC1CON1 = 0x00;
 }
 
 void setup_sci(void){
