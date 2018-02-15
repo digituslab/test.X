@@ -58,6 +58,7 @@ void flip_led(void);
 void setup_irq(void);
 void setup_sci(void);
 void setup_dac(void);
+void setup_i2c(void);
 
 /*
  * 
@@ -78,6 +79,7 @@ int main(int argc, char** argv) {
      PORTA      = 0b00000000 ;  // RA出力ピンの初期化(全てLOWにする)
      PORTC      = 0b00000000 ;  // RC出力ピンの初期化(全てLOWにする)
      
+     
      ADCON0 = 0b00011101;
      ADCON1 = 0b10010000;
      
@@ -86,22 +88,7 @@ int main(int argc, char** argv) {
      RC2PPS    = 0b00001100 ;   // CLC1OUT出力をRA2から出す。
      CCP1CON = 0b00001100;      // CCP1 is PWM mode
      CCPR1L = 10;               // Initial PWM duty is 10.
-     /*
-     CLCIN0PPS = 0x05 ;       // CLCIN0 入力はRA5から入れる
-     CLCIN1PPS = 0x00 ;
-     CLCIN2PPS = 0x00 ;
-     CLCIN3PPS = 0x00 ;
-     CLC1GLS0  = 0x02 ;       // ゲート１は入力１の信号(CLCIN0)を真(非反転)で使用する
-     CLC1GLS1  = 0x08 ;       // ゲート２は入力２の信号(PWM3)を真(非反転)で使用する
-     CLC1GLS2  = 0x08 ;       // ゲート３は入力２の信号(PWM3)を真(非反転)で使用する
-     CLC1GLS3  = 0x08 ;       // ゲート４は入力２の信号(PWM3)を真(非反転)で使用する
-     CLC1SEL0  = 0x00 ;       // 入力１はCLCIN0PPSのレジスタ(RA5)から入力
-     CLC1SEL1  = 0x0E ;       // 入力２はPWM3から入力
-     CLC1SEL2  = 0x00 ;
-     CLC1SEL3  = 0x00 ;
-     CLC1POL   = 0x00 ;       // ゲート出力もＣＬＣ出力も反転出力はしない
-     CLC1CON   = 0x82 ;       // CLCは有効で、ロジックは[4-input AND]
-     */
+
      // ＰＷＭ３の設定
      
      //PWM3CON = 0b10000000 ;   // PWM3ピンからは出力しない
@@ -117,27 +104,40 @@ int main(int argc, char** argv) {
      
      setup_tmr();
      setup_irq();
-     setup_sci();
-     setup_dac();
+     setup_i2c();
+    
+//     setup_sci();
+//     setup_dac();
      
      while(1) {
-          num = adconv() ;  // 7番ピン(AN7)から半固定抵抗の値を読み込む
-//          CCPR1L = num/4 ;  // アナログ値からのデータでデューティ値を設定
-          yd = sin(DEG2RAD*xd)*127.0 + 127.0;
-          xd+=(num/10);
-          if(xd >=360.0){xd = 0;}
-          CCPR1L = (unsigned char)(yd/2+5);
-          DAC1CON1 = (unsigned char)yd;
-          //CCPR1L = 10;
-          /*
-          PORTC=0x00;
-          PORTC=0xff;
-          */
-        TX1REG = 0x55;
-        while(TX1STAbits.TRMT != 1);
 
      }    
     return (EXIT_SUCCESS);
+}
+
+void setup_i2c(void){
+    // Configure pin function
+    RC1PPS = 0b00010001;    // RC1 is SDA for output
+    RC0PPS = 0b00010000;    // RC0 is SCL for output
+
+    TRISCbits.TRISC1 = 1;   // RC1 is input for SDA IN
+    TRISCbits.TRISC0 = 1;   // RC0 is input for SCL IN
+    
+    
+    // I2C module configuration
+    SSP1STATbits.SMP = 1;           // Standard srew-rate (100kbps)
+    SSP1CON1 = 0b00101000;
+    SSP1CON2 = 0;
+    SSP1ADD = 50;
+    SSP1STAT = 0;
+    SSP1CON1bits.SSPEN= 1;          // Enables SDA pin and SDL pin
+ 
+    SSP1CON2bits.SEN = 1;
+    
+    while(PIR1bits.SSP1IF){
+        PIR1bits.SSP1IF &= 0;
+    }
+    return;
 }
 
 void flip_led(void){

@@ -6397,11 +6397,14 @@ void setup_tmr(void);
 void flip_led(void);
 void setup_irq(void);
 void setup_sci(void);
+void setup_dac(void);
+void setup_i2c(void);
 
-# 64
+# 66
 int main(int argc, char** argv) {
 unsigned int num;
 static float yd = 0;
+static float xd = 0;
 
 
 OSCCON = 0b01110010 ;
@@ -6414,6 +6417,7 @@ WPUA = 0b00100000 ;
 PORTA = 0b00000000 ;
 PORTC = 0b00000000 ;
 
+
 ADCON0 = 0b00011101;
 ADCON1 = 0b10010000;
 
@@ -6423,7 +6427,9 @@ RC2PPS = 0b00001100 ;
 CCP1CON = 0b00001100;
 CCPR1L = 10;
 
-# 106
+
+
+
 PWM3DCH = 64 ;
 PWM3DCL = 0 ;
 
@@ -6436,25 +6442,57 @@ num = 255;
 
 setup_tmr();
 setup_irq();
-setup_sci();
+setup_i2c();
+
+
+
 
 while(1) {
-num = adconv() ;
-CCPR1L = num/4 ;
-yd = sin((3.141592/180.0)*30.0)*1.0;
-
-# 129
-TX1REG = 0x55;
-while(TX1STAbits.TRMT != 1);
 
 }
 return (0);
 }
 
+void setup_i2c(void){
+
+RC1PPS = 0b00010001;
+RC0PPS = 0b00010000;
+
+TRISCbits.TRISC1 = 1;
+TRISCbits.TRISC0 = 1;
+
+
+
+SSP1STATbits.SMP = 1;
+SSP1CON1 = 0b00101000;
+SSP1CON2 = 0;
+SSP1ADD = 20;
+SSP1STAT = 0;
+SSP1CON1bits.SSPEN= 1;
+
+SSP1CON2bits.SEN = 1;
+
+while(PIR1bits.SSP1IF){
+PIR1bits.SSP1IF &= 0;
+}
+return;
+}
+
 void flip_led(void){
 PORTAbits.RA5 = !PORTAbits.RA5;
 
-# 147
+# 154
+}
+
+void setup_dac(void){
+
+ANSELAbits.ANSA2 = 1;
+
+
+
+
+DAC1CON0 = 0b10010000;
+DAC1CON1 = 0x00;
 }
 
 void setup_sci(void){
