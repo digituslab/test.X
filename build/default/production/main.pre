@@ -6379,7 +6379,7 @@ extern double fmod(double, double);
 extern double trunc(double);
 extern double round(double);
 
-# 43 "main.c"
+# 47 "main.c"
 unsigned int adconv()
 {
 unsigned int temp;
@@ -6398,9 +6398,24 @@ void flip_led(void);
 void setup_irq(void);
 void setup_sci(void);
 void setup_dac(void);
+
 void setup_i2c(void);
 
-# 66
+void i2c_master_start(void);
+void i2c_idleCheck(char mask);
+int i2c_Start(int adrs,int rw);
+void i2c_stop();
+
+void LCD_Clear(void);
+void LCD_SetCursor(int col, int row);
+void LCD_Putc(char c);
+void LCD_Puts(const char * s);
+void LCD_CreateChar(int p,char *dt);
+void LCD_Init(void);
+
+static int AckCheck;
+
+# 85
 int main(int argc, char** argv) {
 unsigned int num;
 static float yd = 0;
@@ -6444,44 +6459,195 @@ setup_tmr();
 setup_irq();
 setup_i2c();
 
+LCD_Init();
+LCD_Clear();
 
+# 145
+LCD_SetCursor(0,0);
+LCD_Puts("Hello world!");
+LCD_SetCursor(0,1);
+LCD_Puts("Feb.19,2018");
 
 
 while(1) {
+
+
+
 
 }
 return (0);
 }
 
 void setup_i2c(void){
+_delay((unsigned long)((40)*(8000000/4000.0)));
+
 
 RC1PPS = 0b00010001;
 RC0PPS = 0b00010000;
+
+
+ANSELCbits.ANSC0 = 0;
+ANSELCbits.ANSC1 = 0;
+
 
 TRISCbits.TRISC1 = 1;
 TRISCbits.TRISC0 = 1;
 
 
 
-SSP1STATbits.SMP = 1;
+SSP1STAT = 0b10000000;
 SSP1CON1 = 0b00101000;
-SSP1CON2 = 0;
-SSP1ADD = 50;
+
+SSP1ADD = 12;
 SSP1STAT = 0;
-SSP1CON1bits.SSPEN= 1;
 
-SSP1CON2bits.SEN = 1;
+PIE1bits.SSP1IE = 1;
+PIE2bits.BCL1IE = 1;
+INTCONbits.GIE = 1;
+INTCONbits.PEIE = 1;
+PIR1bits.SSP1IF = 0;
+PIR2bits.BCL1IF = 0;
 
-while(PIR1bits.SSP1IF){
-PIR1bits.SSP1IF &= 0;
-}
+# 194
 return;
 }
+
+void i2c_idleCheck(char mask){
+while (( SSP1CON2 & 0x1F ) | (SSP1STAT & mask)) ;
+}
+
+int i2c_Start(int adrs,int rw)
+{
+
+i2c_idleCheck(0x5) ;
+SSP1CON2bits.SEN = 1 ;
+
+i2c_idleCheck(0x5) ;
+AckCheck = 1 ;
+SSPBUF = (char)((adrs<<1)+rw) ;
+while (AckCheck) ;
+return SSPCON2bits.ACKSTAT ;
+}
+
+void i2c_stop()
+{
+
+i2c_idleCheck(0x5) ;
+SSP1CON2bits.PEN = 1 ;
+}
+
+int i2c_send(char dt)
+{
+i2c_idleCheck(0x5) ;
+AckCheck = 1 ;
+SSP1BUF = dt ;
+while (AckCheck) ;
+return SSP1CON2bits.ACKSTAT ;
+}
+
+
+void command(unsigned char c)
+{
+int ans ;
+ans = i2c_Start((0x3e),(0));
+if (ans == 0) {
+
+i2c_send(0b00000000) ;
+i2c_send(c) ;
+}
+i2c_stop() ;
+_delay((unsigned long)((26)*(8000000/4000000.0))) ;
+}
+
+# 247
+void LCD_Clear(void)
+{
+command(0x01) ;
+_delay((unsigned long)((5)*(8000000/4000.0))) ;
+}
+
+# 259
+void LCD_SetCursor(int col, int row)
+{
+int row_offsets[] = { 0x00, 0x40 } ;
+command(0x80 | (col + row_offsets[row])) ;
+}
+
+# 270
+void LCD_Putc(char c)
+{
+int ans ;
+ans = i2c_Start((0x3e),(0));
+if (ans == 0) {
+
+i2c_send(0b01000000) ;
+i2c_send(c) ;
+}
+i2c_stop() ;
+_delay((unsigned long)((26)*(8000000/4000000.0))) ;
+}
+
+# 289
+void LCD_Puts(const char * s)
+{
+int ans ;
+while(*s) {
+LCD_Putc(*s++);
+}
+}
+
+# 305
+void LCD_CreateChar(int p,char *dt)
+{
+command(0x40 | p << 3 );
+_delay((unsigned long)((5)*(8000000/4000.0))) ;
+for (int i=0; i < 8; i++) {
+LCD_Putc(*dt++);
+}
+}
+
+# 317
+void LCD_Init(void)
+{
+command(0x38);
+_delay((unsigned long)((5)*(8000000/4000.0))) ;
+command(0x39);
+_delay((unsigned long)((5)*(8000000/4000.0))) ;
+command(0x14);
+_delay((unsigned long)((5)*(8000000/4000.0))) ;
+command(0x73);
+_delay((unsigned long)((5)*(8000000/4000.0))) ;
+command(0x53);
+_delay((unsigned long)((5)*(8000000/4000.0))) ;
+command(0x6c);
+_delay((unsigned long)((5)*(8000000/4000.0))) ;
+command(0x38);
+_delay((unsigned long)((5)*(8000000/4000.0))) ;
+
+command(0x01);
+_delay((unsigned long)((5)*(8000000/4000.0))) ;
+command(0x38);
+_delay((unsigned long)((5)*(8000000/4000.0))) ;
+
+
+
+command(0x0c);
+_delay((unsigned long)((5)*(8000000/4000.0))) ;
+
+
+
+command(0x06);
+_delay((unsigned long)((5)*(8000000/4000.0))) ;
+
+
+LCD_Clear() ;
+}
+
 
 void flip_led(void){
 PORTAbits.RA5 = !PORTAbits.RA5;
 
-# 154
+# 365
 }
 
 void setup_dac(void){
@@ -6551,7 +6717,7 @@ INTCONbits.GIE = 0;
 
 if(TMR0IF){
 
-if(tm > 5){
+if(tm > 10){
 flip_led();
 tm = 0;
 } else {
@@ -6568,6 +6734,15 @@ INTCONbits.INTF &= 0;
 
 
 PORTAbits.RA5 = 1;
+}
+
+if(PIR1bits.SSP1IF == 1){
+if(AckCheck == 1){ AckCheck = 0; }
+PIR1bits.SSP1IF = 0;
+}
+
+if(PIR2bits.BCL1IF == 1){
+PIR2bits.BCL1IF = 0;
 }
 
 INTCONbits.GIE = 1;
