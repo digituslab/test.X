@@ -37,6 +37,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+// Typo
+
 unsigned int adconv()
 {
      unsigned int temp;
